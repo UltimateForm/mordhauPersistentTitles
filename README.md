@@ -13,7 +13,7 @@ This a Discord X RCON bot that is used to implement persistent tags (via RCON's 
 ## What it do?
 
 This bot allows you to 
-- have custom tags (or titles) in front of player's names, i.e. you can tag a player with name "FFAer" or "Champion". These tags will last until they're removed. **Note that if you add a tag to player while he is ingame he will need to rejoin server for tag to take effect**
+- have custom tags (or titles) in front of player's names, i.e. you can tag a player with name "FFAer" or "Champion". These tags will last until they're removed. **Note that if you add a tag to player while he is ingame he will need to either rejoin server or wait till next round for tag to take effect**
   - the difference between this and the much simpler rcon's `renameplayer` is that this one will persist across sessions, the tag will persist even after player logs out or round ends
 - have specific server messages automatically spawn when selected players join server
 
