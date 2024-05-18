@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "persistentTitless"
+
+[packages]
+asyncio = "*"
+pygrok = "*"
+reactivex = "*"
+"discord.py" = "*"
+dacite = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11.3"
+python_full_version = "3.11.3"
