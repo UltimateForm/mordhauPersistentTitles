@@ -9,6 +9,7 @@ pygrok = "*"
 reactivex = "*"
 "discord.py" = "*"
 dacite = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
