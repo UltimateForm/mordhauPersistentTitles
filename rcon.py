@@ -3,6 +3,7 @@ import struct
 import os
 from asyncio import StreamReader, StreamWriter
 from contextlib import AbstractAsyncContextManager
+import logger
 
 # Packet types
 SERVERDATA_AUTH = 3
@@ -85,7 +86,9 @@ class RconClient:
         return self._counter
 
     async def rewarm(self):
-        self._writer.write(RconPacket(1, SERVERDATA_EXECCOMMAND, "alive").pack())
+        self._writer.write(
+            RconPacket(self.build_packet_id(), SERVERDATA_EXECCOMMAND, "alive").pack()
+        )
         await self._writer.drain()
 
     async def get_connection(self):
@@ -99,13 +102,16 @@ class RconClient:
         reader, writer = connection
         self._reader = reader
         self._writer = writer
+        pkt_id = self.build_packet_id()
         writer.write(
-            RconPacket(self.build_packet_id(), SERVERDATA_AUTH, self._password).pack()
+            RconPacket(pkt_id, SERVERDATA_AUTH, self._password).pack()
         )
         await writer.drain()
         auth_response = await self.recv_pkt()
-        if auth_response.pkt_id != 1:
-            raise ValueError("AUTHENTICATION FAILURE")
+        if auth_response.pkt_id != pkt_id:
+            raise ValueError(
+                f"AUTHENTICATION FAILURE, MISMATCHING PKT ID INPUT={pkt_id}; OUTPUT={auth_response.pkt_id}"
+            )
 
     async def execute(self, command: str, msg_type: int = SERVERDATA_EXECCOMMAND):
         pckt_id = self.build_packet_id()
@@ -113,7 +119,7 @@ class RconClient:
         await self._writer.drain()
         response = await self.recv_pkt()
         if response.pkt_id != pckt_id:
-            raise ValueError("PACKET ID MISMATCH")
+            raise ValueError(f"PACKET ID MISMATCH INPUT={pckt_id}; OUTPUT={response.pkt_id}")
         return response.body
 
 
@@ -133,7 +139,7 @@ class RconContext(RconClient, AbstractAsyncContextManager):
 async def main():
     async with RconContext() as client:
         r = await client.execute("info")
-        print(f"\n{r}")
+        logger.info(f"\n{r}")
 
 
 if __name__ == "__main__":

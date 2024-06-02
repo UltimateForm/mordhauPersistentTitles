@@ -3,10 +3,13 @@ import asyncio
 import json
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
 from data import Config, load_config, save_config
 from rcon_listener import RconListener
 from login_observer import LoginObserver
+import logger
 
+load_dotenv()
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -160,6 +163,7 @@ login_listener.subscribe(login_observer)
 
 
 async def main():
+    logger.use_date_time_logger()
     await asyncio.gather(
         login_listener.start(), bot.start(token=os.environ.get("D_TOKEN"))
     )

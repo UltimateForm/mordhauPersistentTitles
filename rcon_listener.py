@@ -1,6 +1,7 @@
 import asyncio
 from reactivex import Subject, operators
 from rcon import RconClient
+import logger
 
 RECONNECT_WAIT_TIME_SECS = 5
 
@@ -23,19 +24,24 @@ class RconListener(Subject[str], RconClient):
         while True:
             await asyncio.sleep(100)
             try:
-                print("Rewarming...")
-                await self.rewarm()
+                logger.debug(f"{self._event} listener: Rewarming...")
+                async with asyncio.timeout(self._connect_timeout):
+                    await self.rewarm()
+                logger.debug(f"{self._event} listener: Rewarm complete")
             except Exception as e:
-                print(f"FAILED TO REWARM! ERROR: {str(e)}")
+                logger.error(
+                    f"{self._event} listener: FAILED TO REWARM! ERROR: {str(e)}"
+                )
 
-    async def _start(self):
+    async def _start(self, listening: bool = False):
         rewarm_task: asyncio.Task | None = None
         try:
+            logger.info(f"{self._event} listener: authenticating...")
             await self.authenticate()
-            if not self._listening:
+            logger.info(f"{self._event} listener: authentication complete")
+            if not listening:
                 r = await self.execute(f"listen {self._event}")
-                print(r)
-                self._listening = True
+                logger.info(f"{self._event} listener: {r}")
             rewarm_task = asyncio.create_task(self.warmer())
             while True:
                 pck = await self.recv_pkt()
@@ -48,11 +54,12 @@ class RconListener(Subject[str], RconClient):
     async def start(self):
         while True:
             try:
-                await self._start()
+                logger.info(f"{self._event} listener: Initiating...")
+                await self._start(self._listening)
                 return
-            except (ConnectionError, TimeoutError) as e:
-                print(
-                    f"Connection error occured: {str(e) or type(e).__name__}\nAttempting reconnection in {RECONNECT_WAIT_TIME_SECS} seconds..."
+            except Exception as e:
+                logger.error(
+                    f"{self._event} listener:  Connection error occured: {str(e) or type(e).__name__}. Attempting reconnection in {RECONNECT_WAIT_TIME_SECS} seconds..."
                 )
                 await asyncio.sleep(RECONNECT_WAIT_TIME_SECS)
 
@@ -60,12 +67,12 @@ class RconListener(Subject[str], RconClient):
 if __name__ == "__main__":
     login_listener = RconListener(event="login", listening=False)
     login_listener.pipe(operators.filter(lambda x: x.startswith("Login:"))).subscribe(
-        on_next=lambda x: print(f"LOGIN: {x}")
+        on_next=lambda x: logger.info(f"LOGIN: {x}")
     )
 
     chat_listener = RconListener(event="chat", listening=True)
     chat_listener.pipe(operators.filter(lambda x: x.startswith("Chat:"))).subscribe(
-        on_next=lambda x: print(f"CHAT: {x}")
+        on_next=lambda x: logger.info(f"CHAT: {x}")
     )
 
     async def main():
