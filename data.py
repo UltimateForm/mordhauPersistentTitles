@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import json
 import os
 from dacite import from_dict
-
+import logger
 
 @dataclass
 class Config:
@@ -31,4 +31,4 @@ if __name__ == "__main__":
     conf = load_config()
     conf.tags["test"] = "HELLO"
     save_config(conf)
-    print(conf)
+    logger.info(conf)

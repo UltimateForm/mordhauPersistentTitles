@@ -22,4 +22,6 @@ COPY ./login_observer.py .
 
 COPY ./data.py .
 
+COPY ./logger.py .
+
 CMD ["pipenv", "run", "python", "main.py"]
