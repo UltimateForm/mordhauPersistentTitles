@@ -76,3 +76,4 @@ D_TOKEN=sNb5gkzmvnJ8W9rxHP23kNV5s7GDwtY4J4cY4JNbbM5Bctd8UFURsv8TAShsPdPDXFcaai2W
 ## Important notes
 1. This bot doesn't use (yet) the native discord commands
 2. This bot hasn't been stress tested, a previous version has been tested on a server with 20-40 players, but was different code
+3. if you run the bot in your own way without pipenv remember that you need a way to load the .envs into your environment variables
