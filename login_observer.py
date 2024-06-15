@@ -19,7 +19,9 @@ class LoginObserver(Observer[str]):
     async def handle_tag(self, event_data: dict[str, str]):
         playfab_id = event_data["playfabId"]
         user_name = event_data["userName"]
-        target_tag = self._config.tags.get(playfab_id, None)
+        target_tag = self._config.tags.get(playfab_id, None) or self._config.tags.get(
+            "*", None
+        )
         if not target_tag:
             return
         tag_formatted = self.get_tag(target_tag)
@@ -34,7 +36,9 @@ class LoginObserver(Observer[str]):
         target_salute = self._config.salutes.get(playfab_id, None)
         if not target_salute:
             return
-        await asyncio.sleep(self._config.salute_timer) # so player can see his own salute
+        await asyncio.sleep(
+            self._config.salute_timer
+        )  # so player can see his own salute
         async with asyncio.timeout(10):
             async with RconContext() as client:
                 await client.execute(f"say {target_salute}")

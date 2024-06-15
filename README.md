@@ -3,12 +3,12 @@
 This a Discord X RCON bot that is used to implement persistent tags (via RCON's `renameplayer`) and salutes (via RCON's `say`)
 
 - [mordhauPersistentTitles](#mordhaupersistenttitles)
-	- [What it do?](#what-it-do)
-	- [Usage](#usage)
-		- [Setup](#setup)
-		- [Discord usage](#discord-usage)
-	- [Example .env](#example-env)
-	- [Important notes](#important-notes)
+  - [What it do?](#what-it-do)
+  - [Usage](#usage)
+    - [Setup](#setup)
+    - [Discord usage](#discord-usage)
+  - [Example .env](#example-env)
+  - [Important notes](#important-notes)
 
 ## What it do?
 
@@ -32,6 +32,7 @@ You need at least Docker installed and a terminal that can run .sh files (linux 
     1. RCON_PORT
     2. RCON_CONNECT_TIMEOUT (optional)
     3. D_TOKEN (discord bot auth token)
+    4. BOT_CHANNEL (optional id of channel if you want to limit bot use to one channel)
 2. run `sh restart.sh` in terminal
     1. if you're familar with docker or python you don't necessarily need to this, you can run this bot anywhere and however you want
 
@@ -48,6 +49,7 @@ Commands:
   - example: `.setSaluteTimer 2`
 - .addTag {playfab id} {tag}
   - sets a tag for a playfab id
+  - use `*` in place of playfabid to add title for everyone
   - example: `.addTag D98123JKAS78354 CryBaby`
 - .removeTag {playfab id}
   - removes tag for playfabid
