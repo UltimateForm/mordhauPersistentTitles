@@ -24,4 +24,12 @@ COPY ./data.py .
 
 COPY ./logger.py .
 
+COPY ./chat_observer.py .
+
+COPY ./database.py .
+
+COPY ./playtime_client .
+
+COPY ./session_topic .
+
 CMD ["pipenv", "run", "python", "main.py"]
