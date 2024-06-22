@@ -47,8 +47,8 @@ class LoginObserver(Observer[str]):
         (success, event_data) = parse_event(value, GROK_LOGIN_EVENT)
         if not success:
             return
-        event_text = event_data["eventText"].lower()
-        if event_text.startswith("logged out"):
+        order = event_data["order"].lower()
+        if order == "out":
             return
         asyncio.create_task(self.handle_salute(event_data))
         asyncio.create_task(self.handle_tag(event_data))

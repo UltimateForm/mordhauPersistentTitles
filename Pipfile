@@ -10,6 +10,7 @@ reactivex = "*"
 "discord.py" = "*"
 dacite = "*"
 python-dotenv = "*"
+motor = "*"
 
 [dev-packages]
 
