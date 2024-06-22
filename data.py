@@ -4,12 +4,19 @@ import os
 from dacite import from_dict
 import logger
 
+
 @dataclass
 class Config:
     tags: dict[str, str]
     salutes: dict[str, str]
     tag_format: str = "[{0}]"
     salute_timer: int = 2
+
+
+@dataclass
+class SessionEvent:
+    playfab_id: str
+    minutes: int
 
 
 def load_config(path: str = "./persist/config.json") -> Config:

@@ -4,13 +4,19 @@ from data import Config
 from rcon import RconContext
 from rcon_listener import RconListener
 from parsers import parse_event, GROK_LOGIN_EVENT
+import logger
+from playtime_client import PlaytimeClient
 
 
 class LoginObserver(Observer[str]):
     _config: Config
+    playtime_client: PlaytimeClient | None
 
-    def __init__(self, config: Config) -> None:
+    def __init__(
+        self, config: Config, playtime_client: PlaytimeClient | None = None
+    ) -> None:
         self._config = config
+        self.playtime_client = playtime_client
         super().__init__()
 
     def get_tag(self, tag: str):

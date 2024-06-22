@@ -6,6 +6,11 @@ This a Discord X RCON bot that is used to implement persistent tags (via RCON's 
   - [What it do?](#what-it-do)
   - [Usage](#usage)
     - [Setup](#setup)
+    - [Playtime Titles](#playtime-titles)
+      - [REQUIRED TABLES (COLLECTIONS)](#required-tables-collections)
+      - [Ingame features](#ingame-features)
+      - [.env Config](#env-config)
+    - [FAQ:](#faq)
     - [Discord usage](#discord-usage)
   - [Example .env](#example-env)
   - [Important notes](#important-notes)
@@ -16,6 +21,7 @@ This bot allows you to
 - have custom tags (or titles) in front of player's names, i.e. you can tag a player with name "FFAer" or "Champion". These tags will last until they're removed. **Note that if you add a tag to player while he is ingame he will need to either rejoin server or wait till next round for tag to take effect**
   - the difference between this and the much simpler rcon's `renameplayer` is that this one will persist across sessions, the tag will persist even after player logs out or round ends
 - have specific server messages automatically spawn when selected players join server
+- if enabled, have custom [playtime titles](#playtime-titles)
 
 These features are managed via discord
 
@@ -33,8 +39,64 @@ You need at least Docker installed and a terminal that can run .sh files (linux 
     2. RCON_CONNECT_TIMEOUT (optional)
     3. D_TOKEN (discord bot auth token)
     4. BOT_CHANNEL (optional id of channel if you want to limit bot use to one channel)
+    5. DB_CONNECTION_STRING (optional, for [playtime titles](#playtime-titles))
+    6. DB_NAME (optiona, for [playtime titles](#playtime-titles))
 2. run `sh restart.sh` in terminal
     1. if you're familar with docker or python you don't necessarily need to this, you can run this bot anywhere and however you want
+
+### Playtime Titles
+Playtime titles are only enabled once you have a configured MongoDB instance.
+Check here for how to get started: https://www.mongodb.com/pricing
+
+Make sure your instance is located geographically close to bot for best performance
+
+#### REQUIRED TABLES (COLLECTIONS)
+(If you don't know how to add tables: https://www.mongodb.com/docs/atlas/atlas-ui/collections/)
+
+You will need to at least have 2 tables created for playtime titles:
+1. `live_session`: this is where sessions are ephemeraly stored
+   1. while ingame users will have records in this table with their login time
+   2. when users logout of game session time is calculated and record is deleted
+2. `playtime`
+   1. this is where playtimes are stored, in minutes
+
+#### Ingame features
+- while ingame players can write `.playtime` to obtain their playtimes
+- players will have playtime titles appended to their names according to how long they have played on your server
+- playtime titles are replaced by titles added via `.addTag PLAYFABID`
+
+#### .env Config
+1. DB_CONNECTION_STRING (connection string)
+   1. this is a connection string for your mongoddb instance, if you are lost please read here: https://www.mongodb.com/docs/guides/atlas/connection-string/
+2. DB_NAME (database name)
+   1. this is the database, you can create a new one or use any existing one you already have
+   2. if you're lost read here https://www.mongodb.com/resources/products/fundamentals/create-database
+
+### FAQ:
+1. what is minumum amount of playtime to be recorded?
+   1. 1 minute
+2. is player's playtime updated in realtime?
+   1. no
+   2. it's always updated at end of session
+3. how is playtime calculated?
+   1. upon player joining server:
+      1. session record is created in db
+      2. this includes login date and time
+   2. upon player leaving server:
+      1. session record is deleted in db
+      2. session time is calculated (logout time - login time)
+      3. calculated session time is added to player's total playtime in db
+4. can i manually change a player's playtime?
+   1. yes
+   2. you can do it in mongodb directly
+   3. remember that the unit of time is minutes
+      1. example db document:
+      ```json
+      {
+        "playfab_id": "TASDK7823KJKJSD7",
+        "minutes": 120
+      }
+      ```
 
 ### Discord usage
 
@@ -51,9 +113,13 @@ Commands:
   - sets a tag for a playfab id
   - use `*` in place of playfabid to add title for everyone
   - example: `.addTag D98123JKAS78354 CryBaby`
+- .addPlaytimeTag {time} {tag}
+  - tbd
 - .removeTag {playfab id}
   - removes tag for playfabid
   - example: `.removeTag D98123JKAS78354`
+- .removePlaytimeTag {time}
+  - tbd
 - .addSalute {playfab id} {salute text}
   - adds salute for playfab id
   - use quotes ("") for multi word salutes
@@ -72,6 +138,8 @@ RCON_ADDRESS=192.168.0.52
 RCON_PORT=27019
 RCON_CONNECT_TIMEOUT=10
 D_TOKEN=sNb5gkzmvnJ8W9rxHP23kNV5s7GDwtY4J4cY4JNbbM5Bctd8UFURsv8TAShsPdPDXFcaai2WlPaHy3Rxis5C3m5dHXk1leUU
+DB_CONNECTION_STRING=mongodb+srv://yourMongoDbUser:yourSafeMongoDbPsw@url.to.mongodb.net
+DB_NAME=mordhau
 ```
 
 
