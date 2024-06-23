@@ -10,7 +10,7 @@ This a Discord X RCON bot that is used to implement persistent tags (via RCON's 
       - [REQUIRED TABLES (COLLECTIONS)](#required-tables-collections)
       - [Ingame features](#ingame-features)
       - [.env Config](#env-config)
-    - [FAQ:](#faq)
+      - [FAQ](#faq)
     - [Discord usage](#discord-usage)
   - [Example .env](#example-env)
   - [Important notes](#important-notes)
@@ -72,7 +72,7 @@ You will need to at least have 2 tables created for playtime titles:
    1. this is the database, you can create a new one or use any existing one you already have
    2. if you're lost read here https://www.mongodb.com/resources/products/fundamentals/create-database
 
-### FAQ:
+#### FAQ
 1. what is minumum amount of playtime to be recorded?
    1. 1 minute
 2. is player's playtime updated in realtime?
