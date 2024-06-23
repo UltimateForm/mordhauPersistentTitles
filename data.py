@@ -1,15 +1,23 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
 import os
 from dacite import from_dict
 import logger
 
+
 @dataclass
 class Config:
     tags: dict[str, str]
     salutes: dict[str, str]
+    playtime_tags: dict[str, str] | None = field(default_factory={})
     tag_format: str = "[{0}]"
     salute_timer: int = 2
+
+
+@dataclass
+class SessionEvent:
+    playfab_id: str
+    minutes: int
 
 
 def load_config(path: str = "./persist/config.json") -> Config:
@@ -28,7 +36,20 @@ def save_config(config: Config, path: str = "./persist/config.json"):
 
 
 if __name__ == "__main__":
+    import numpy
+
+    logger.use_date_time_logger()
     conf = load_config()
-    conf.tags["test"] = "HELLO"
-    save_config(conf)
-    logger.info(conf)
+    print(conf)
+    playtime_keys = list(conf.playtime_tags.keys())
+    gates = numpy.fromiter(
+        [int(key) for key in playtime_keys if key.isnumeric()], numpy.int64
+    )
+    value = 120
+    min_gates = gates[gates <= value]
+    if len(min_gates) == 0:
+        print("None found")
+        exit()
+    highest_gate = min_gates.max()
+    target_tag = conf.playtime_tags[str(highest_gate)]
+    print(f"Target tag: {target_tag}")

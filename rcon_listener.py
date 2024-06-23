@@ -65,12 +65,13 @@ class RconListener(Subject[str], RconClient):
 
 
 if __name__ == "__main__":
+    logger.use_date_time_logger()
     login_listener = RconListener(event="login", listening=False)
     login_listener.pipe(operators.filter(lambda x: x.startswith("Login:"))).subscribe(
         on_next=lambda x: logger.info(f"LOGIN: {x}")
     )
 
-    chat_listener = RconListener(event="chat", listening=True)
+    chat_listener = RconListener(event="chat", listening=False)
     chat_listener.pipe(operators.filter(lambda x: x.startswith("Chat:"))).subscribe(
         on_next=lambda x: logger.info(f"CHAT: {x}")
     )
