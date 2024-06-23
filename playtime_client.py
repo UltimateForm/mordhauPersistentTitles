@@ -1,7 +1,6 @@
 from os import environ
-from reactivex import Observer
 import asyncio
-from reactivex.typing import OnCompleted, OnError, OnNext
+from reactivex import Observer
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorClient
 import logger
 from data import SessionEvent
@@ -30,7 +29,7 @@ class PlaytimeClient(Observer[SessionEvent]):
                 f"Failed to add playtime ({minutes} mins) to playfab id {playfab_id}"
             )
 
-    async def get_playtime(self, playfab_id: str):
+    async def get_playtime(self, playfab_id: str) -> int:
         read = await self._collection.find_one({"playfab_id": playfab_id})
         return read.get("minutes", 0) if read else 0
 

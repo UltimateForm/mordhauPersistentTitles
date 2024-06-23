@@ -4,11 +4,7 @@ import json
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from motor.motor_asyncio import (
-    AsyncIOMotorClient,
-    AsyncIOMotorDatabase,
-    AsyncIOMotorCollection,
-)
+from motor.motor_asyncio import AsyncIOMotorCollection
 from reactivex import operators
 from data import Config, load_config, save_config
 from database import load_db
@@ -99,6 +95,24 @@ async def add_tag(ctx: commands.Context, arg_playfab_id: str, arg_tag: str):
     await ctx.message.reply(embed=embed)
 
 
+@bot.command("addPlaytimeTag")
+async def add_playtime_tag(ctx: commands.Context, arg_minutes: int, arg_tag: str):
+    if bot_channel and ctx.channel.id != bot_channel:
+        return
+    embed = make_embed(ctx)
+    embed.add_field(name="Min minutes played", value=arg_minutes)
+    embed.add_field(name="Tag", value=arg_tag)
+    try:
+        config.playtime_tags[str(arg_minutes)] = arg_tag
+        save_config(config)
+        embed.add_field(name="Success", value=True, inline=False)
+    except Exception as e:
+        embed.add_field(name="Success", value=False, inline=False)
+        embed.add_field(name="Error", value=str(e), inline=False)
+        embed.color = 15548997  # red
+    await ctx.message.reply(embed=embed)
+
+
 @bot.command("removeTag")
 async def remove_tag(ctx: commands.Context, arg_playfab_id: str):
     if bot_channel and ctx.channel.id != bot_channel:
@@ -113,6 +127,29 @@ async def remove_tag(ctx: commands.Context, arg_playfab_id: str):
             )
         embed.add_field(name="RemovedTag", value=current_tag)
         config.tags.pop(arg_playfab_id, None)
+        save_config(config)
+        embed.add_field(name="Success", value=True, inline=False)
+    except Exception as e:
+        embed.add_field(name="Success", value=False, inline=False)
+        embed.add_field(name="Error", value=str(e), inline=False)
+        embed.color = 15548997  # red
+    await ctx.message.reply(embed=embed)
+
+
+@bot.command("removePlaytimeTag")
+async def remove_playtime_tag(ctx: commands.Context, arg_minutes: str):
+    if bot_channel and ctx.channel.id != bot_channel:
+        return
+    embed = make_embed(ctx)
+    embed.add_field(name="Min minutes played", value=arg_minutes)
+    try:
+        current_tag = config.playtime_tags.get(arg_minutes, None)
+        if not current_tag:
+            raise ValueError(
+                f"Min minutes played {arg_minutes} doesn't have any registered tag"
+            )
+        embed.add_field(name="RemovedTag", value=current_tag)
+        config.playtime_tags.pop(arg_minutes, None)
         save_config(config)
         embed.add_field(name="Success", value=True, inline=False)
     except Exception as e:
@@ -200,7 +237,9 @@ async def main():
     login_listener = RconListener("login")
     chat_listener = RconListener("chat")
     login_observer = LoginObserver(config, playtime_client)
-    login_listener.pipe(operators.filter(lambda x: x.startswith("Login:"))).subscribe(login_observer)
+    login_listener.pipe(operators.filter(lambda x: x.startswith("Login:"))).subscribe(
+        login_observer
+    )
 
     if playtime_enabled:
         chat_observer = ChatObserver(playtime_client)

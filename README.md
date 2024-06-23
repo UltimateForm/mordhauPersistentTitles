@@ -114,12 +114,15 @@ Commands:
   - use `*` in place of playfabid to add title for everyone
   - example: `.addTag D98123JKAS78354 CryBaby`
 - .addPlaytimeTag {time} {tag}
-  - tbd
+  - sets playtime tag for minimum time played
+  - time must be numeric value representing minutes
+  - example: `.addPlaytimeTag 300 Veteran`
 - .removeTag {playfab id}
   - removes tag for playfabid
   - example: `.removeTag D98123JKAS78354`
 - .removePlaytimeTag {time}
-  - tbd
+  - removes a playtime tag
+  - example: `.removePlaytimeTag 300`
 - .addSalute {playfab id} {salute text}
   - adds salute for playfab id
   - use quotes ("") for multi word salutes
