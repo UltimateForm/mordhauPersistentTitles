@@ -9,7 +9,7 @@ import logger
 class Config:
     tags: dict[str, str]
     salutes: dict[str, str]
-    playtime_tags: dict[str, str] | None = field(default_factory={})
+    playtime_tags: dict[str, str] | None = field(default_factory=dict)
     tag_format: str = "[{0}]"
     salute_timer: int = 2
 
