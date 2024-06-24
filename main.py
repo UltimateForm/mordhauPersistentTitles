@@ -205,16 +205,24 @@ async def get_config(ctx: commands.Context):
     if bot_channel and ctx.channel.id != bot_channel:
         return
     embed = make_embed(ctx)
+    too_long: bool = False
+    json_code: str = ""
     try:
         config_json = json.dumps(config.__dict__, indent=2)
         json_code = f"```{config_json}```"
-        embed.add_field(name="Config", value=json_code, inline=False)
+        too_long = len(json_code) >= 1024
+
+        embed.add_field(
+            name="Config",
+            value=json_code if not too_long else "Too long, sent separately",
+            inline=False,
+        )
         embed.add_field(name="Success", value=True, inline=False)
     except Exception as e:
         embed.add_field(name="Success", value=False, inline=False)
         embed.add_field(name="Error", value=str(e), inline=False)
         embed.color = 15548997  # red
-    await ctx.message.reply(embed=embed)
+    await ctx.message.reply(embed=embed, content=json_code if too_long else None)
 
 
 config = load_config()
