@@ -46,7 +46,7 @@ class RconListener(Subject[str], RconClient):
             while True:
                 pck = await self.recv_pkt()
                 self.on_next(pck.body)
-        except:
+        except Exception:
             if rewarm_task:
                 rewarm_task.cancel()
             raise

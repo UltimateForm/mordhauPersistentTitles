@@ -12,6 +12,7 @@ def use_date_time_logger():
         ],
     )
 
+
 def info(msg: str):
     logging.info(msg)
 

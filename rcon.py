@@ -1,7 +1,6 @@
 import asyncio
 import struct
 import os
-from asyncio import StreamReader, StreamWriter
 from contextlib import AbstractAsyncContextManager
 import logger
 
@@ -52,8 +51,8 @@ class RconClient:
     _port: int
     _password: str
     _address: str
-    _reader: StreamReader
-    _writer: StreamWriter
+    _reader: asyncio.StreamReader
+    _writer: asyncio.StreamWriter
     _counter: int
     _connect_timeout: int
 
@@ -92,7 +91,7 @@ class RconClient:
         await self._writer.drain()
 
     async def get_connection(self):
-        conn: tuple[StreamReader, StreamWriter]
+        conn: tuple[asyncio.StreamReader, asyncio.StreamWriter]
         async with asyncio.timeout(self._connect_timeout):
             conn = await asyncio.open_connection(self._address, self._port)
         return conn
@@ -103,9 +102,7 @@ class RconClient:
         self._reader = reader
         self._writer = writer
         pkt_id = self.build_packet_id()
-        writer.write(
-            RconPacket(pkt_id, SERVERDATA_AUTH, self._password).pack()
-        )
+        writer.write(RconPacket(pkt_id, SERVERDATA_AUTH, self._password).pack())
         await writer.drain()
         auth_response = await self.recv_pkt()
         if auth_response.pkt_id != pkt_id:
@@ -119,7 +116,9 @@ class RconClient:
         await self._writer.drain()
         response = await self.recv_pkt()
         if response.pkt_id != pckt_id:
-            raise ValueError(f"PACKET ID MISMATCH INPUT={pckt_id}; OUTPUT={response.pkt_id}")
+            raise ValueError(
+                f"PACKET ID MISMATCH INPUT={pckt_id}; OUTPUT={response.pkt_id}"
+            )
         return response.body
 
 

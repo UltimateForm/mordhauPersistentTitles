@@ -1,6 +1,5 @@
 from os import environ
 from datetime import datetime, timedelta
-from dataclasses import dataclass
 import asyncio
 import dotenv
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorClient
