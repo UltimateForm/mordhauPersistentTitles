@@ -47,9 +47,15 @@ if __name__ == "__main__":
     )
     value = 120
     min_gates = gates[gates <= value]
+    max_gates = gates[gates > value]
+    next_gate = None
     if len(min_gates) == 0:
         print("None found")
         exit()
     highest_gate = min_gates.max()
+    if len(max_gates):
+        next_gate = max_gates.min()
     target_tag = conf.playtime_tags[str(highest_gate)]
+    next_tag = conf.playtime_tags.get(str(next_gate), None)
     print(f"Target tag: {target_tag}")
+    print(f"Next tag: {next_tag}")

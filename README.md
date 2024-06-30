@@ -61,9 +61,13 @@ You will need to at least have 2 tables created for playtime titles:
    1. this is where playtimes are stored, in minutes
 
 #### Ingame features
-- while ingame players can write `.playtime` to obtain their playtimes
 - players will have playtime titles appended to their names according to how long they have played on your server
 - playtime titles are replaced by titles added via `.addTag PLAYFABID`
+- while ingame players can write `.playtime` to obtain their playtimes
+- commands
+  - `.playtime` shows player's current playtime
+  - `.rank` shows player's current and next playtime rank/tag
+  - `.ranks` shows all ranks
 
 #### .env Config
 1. DB_CONNECTION_STRING (connection string)

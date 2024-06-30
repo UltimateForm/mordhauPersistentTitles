@@ -32,4 +32,6 @@ COPY ./playtime_client.py .
 
 COPY ./session_topic.py .
 
+COPY ./compute.py .
+
 CMD ["pipenv", "run", "python", "main.py"]
