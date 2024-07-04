@@ -67,7 +67,6 @@ You will need to at least have 2 tables created for playtime titles:
 - commands
   - `.playtime` shows player's current playtime
   - `.rank` shows player's current and next playtime rank/tag
-  - `.ranks` shows all ranks
 
 #### .env Config
 1. DB_CONNECTION_STRING (connection string)

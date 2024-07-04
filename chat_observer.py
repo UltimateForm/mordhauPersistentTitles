@@ -5,7 +5,6 @@ from compute import (
     compute_gate_text,
     compute_next_gate_text,
     compute_time_txt,
-    slice_text_array_at_total_length,
 )
 from rcon import RconContext
 from parsers import GROK_CHAT_EVENT, parse_event
@@ -51,36 +50,6 @@ class ChatObserver(Observer[str]):
         async with RconContext() as client:
             await client.execute(f"say {full_msg}")
 
-    # todo: fix bug here, slice_text_array_at_total_length is not accurate with new length calculation, doesnt account for new lines
-    async def handle_ranks(self):
-        playtime_tags = self._config.playtime_tags
-        keys = sorted(
-            [int(key) for key in list(playtime_tags.keys()) if key.isnumeric()]
-        )
-        full_msg_comps = [
-            f"{playtime_tags.get(str(key))}: {compute_time_txt(key)}" for key in keys
-        ]
-        if 0 not in keys:
-            global_rank = self._config.tags.get("*", None)
-            if global_rank:
-                full_msg_comps.insert(0, f"{global_rank}: Base rank")
-        full_msg = "\n".join(full_msg_comps)
-        full_msg_len = len(full_msg)
-        head = "Ranks on playtime:\n"
-        expected_mh_len = len(head) + full_msg_len
-        if expected_mh_len > 280:
-            partitioned = slice_text_array_at_total_length(280, full_msg_comps)
-            cont = False
-            for partition in partitioned:
-                msg = "\n".join(partition)
-                head = head if not cont else ""
-                async with RconContext() as client:
-                    await client.execute(f"say {head}{msg}")
-                cont = True
-        else:
-            async with RconContext() as client:
-                await client.execute(f"say {head}{full_msg}")
-
     def on_next(self, value: str) -> None:
         (success, event_data) = parse_event(value, GROK_CHAT_EVENT)
         if not success:
@@ -92,8 +61,6 @@ class ChatObserver(Observer[str]):
             asyncio.create_task(self.handle_playtime(playfab_id, user_name))
         elif message == ".rank":
             asyncio.create_task(self.handle_rank(playfab_id, user_name))
-        elif message == ".ranks":
-            asyncio.create_task(self.handle_ranks())
 
 
 # todo: add local test run here

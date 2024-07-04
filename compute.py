@@ -45,8 +45,8 @@ def compute_time_txt(minutes: int):
     unit = "mins" if is_less_than_hour else "hours"
     time = minutes if is_less_than_hour else round(minutes / 60, 1)
     if time == 1:
-        unit = unit.rstrip("s")
-    time_without_floating_zero = str(time).rstrip(".0")
+        unit = unit.removesuffix("s")
+    time_without_floating_zero = str(time).removesuffix(r".0")
     time_comp = f"{time_without_floating_zero} {unit}"
     return time_comp
 
