@@ -95,6 +95,24 @@ async def add_tag(ctx: commands.Context, arg_playfab_id: str, arg_tag: str):
     await ctx.message.reply(embed=embed)
 
 
+@bot.command("addRename")
+async def add_rename(ctx: commands.Context, arg_playfab_id: str, arg_rename: str):
+    if bot_channel and ctx.channel.id != bot_channel:
+        return
+    embed = make_embed(ctx)
+    embed.add_field(name="PlayfabId", value=arg_playfab_id)
+    embed.add_field(name="Rename", value=arg_rename)
+    try:
+        config.rename[arg_playfab_id] = arg_rename
+        save_config(config)
+        embed.add_field(name="Success", value=True, inline=False)
+    except Exception as e:
+        embed.add_field(name="Success", value=False, inline=False)
+        embed.add_field(name="Error", value=str(e), inline=False)
+        embed.color = 15548997  # red
+    await ctx.message.reply(embed=embed)
+
+
 @bot.command("addPlaytimeTag")
 async def add_playtime_tag(ctx: commands.Context, arg_minutes: int, arg_tag: str):
     if bot_channel and ctx.channel.id != bot_channel:
@@ -127,6 +145,29 @@ async def remove_tag(ctx: commands.Context, arg_playfab_id: str):
             )
         embed.add_field(name="RemovedTag", value=current_tag)
         config.tags.pop(arg_playfab_id, None)
+        save_config(config)
+        embed.add_field(name="Success", value=True, inline=False)
+    except Exception as e:
+        embed.add_field(name="Success", value=False, inline=False)
+        embed.add_field(name="Error", value=str(e), inline=False)
+        embed.color = 15548997  # red
+    await ctx.message.reply(embed=embed)
+
+
+@bot.command("removeRename")
+async def remove_rename(ctx: commands.Context, arg_playfab_id: str):
+    if bot_channel and ctx.channel.id != bot_channel:
+        return
+    embed = make_embed(ctx)
+    embed.add_field(name="PlayfabId", value=arg_playfab_id)
+    try:
+        current_rename = config.rename.get(arg_playfab_id, None)
+        if not current_rename:
+            raise ValueError(
+                f"PlayfabId {arg_playfab_id} doesn't have any registered rename"
+            )
+        embed.add_field(name="RemovedRename", value=current_rename)
+        config.rename.pop(arg_playfab_id, None)
         save_config(config)
         embed.add_field(name="Success", value=True, inline=False)
     except Exception as e:

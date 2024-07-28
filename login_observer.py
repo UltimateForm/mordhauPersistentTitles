@@ -22,9 +22,13 @@ class LoginObserver(Observer[str]):
     def get_tag(self, tag: str):
         return self._config.tag_format.format(tag)
 
+    def get_rename(self, playfab_id: str):
+        rename = self._config.rename.get(playfab_id, None)
+        return rename
+
     async def handle_tag(self, event_data: dict[str, str]):
         playfab_id = event_data["playfabId"]
-        user_name = event_data["userName"]
+        user_name = self.get_rename(playfab_id) or event_data["userName"]
         target_tag = self._config.tags.get(playfab_id, None)
         if target_tag is None and self.playtime_client is not None:
             minutes_played = await self.playtime_client.get_playtime(playfab_id)
@@ -55,6 +59,15 @@ class LoginObserver(Observer[str]):
             async with RconContext() as client:
                 await client.execute(f"say {target_salute}")
 
+    async def handle_rename(self, event_data: dict[str, str]):
+        playfab_id = event_data["playfabId"]
+        rename = self.get_rename(playfab_id)
+        if not rename:
+            return
+        async with asyncio.timeout(10):
+            async with RconContext() as client:
+                await client.execute(f"renameplayer {playfab_id} {rename}")
+
     def on_next(self, value: str) -> None:
         (success, event_data) = parse_event(value, GROK_LOGIN_EVENT)
         if not success:
@@ -62,6 +75,7 @@ class LoginObserver(Observer[str]):
         order = event_data["order"].lower()
         if order == "out":
             return
+        asyncio.create_task(self.handle_rename(event_data))
         asyncio.create_task(self.handle_salute(event_data))
         asyncio.create_task(self.handle_tag(event_data))
 
