@@ -101,6 +101,9 @@ You will need to at least have 2 tables created for playtime titles:
         "minutes": 120
       }
       ```
+5. bot shuts down or unresponsive after a few seconds/minutes when running with Mordhau-RCON next to it?
+   1. remove setting RCON_CONNECT_TIMEOUT from your game.ini. Don't ask me why but a few people have reported this fixing the issue
+  
 
 ### Discord usage
 
